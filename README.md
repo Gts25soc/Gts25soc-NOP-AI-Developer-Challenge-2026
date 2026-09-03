@@ -8,6 +8,17 @@ Build a useful, working video-intelligence capability on top of the supplied sta
 
 AI-assisted development is allowed. You may use coding assistants, pretrained models, open-source libraries, public datasets, documentation, and your own engineering judgement. You are evaluated on what you build, how well it works, how well you validate it, and whether you understand and can modify your own implementation.
 
+## Start here
+
+Read these before coding:
+
+- [Detailed Candidate Guide](docs/CANDIDATE_GUIDE.md)
+- [Challenge Specification](CHALLENGE.md)
+- [Rules](RULES.md)
+- [Submission Requirements](SUBMISSION.md)
+- [Scoring](SCORING.md)
+- [Public Benchmark Data Pack](data/README.md)
+
 ## What you receive
 
 This repository provides:
@@ -17,7 +28,11 @@ This repository provides:
 - configurable zones and A-to-B/B-to-A event logic;
 - a NOP-style structured evidence writer;
 - JSONL/CSV/snapshot outputs;
-- a clear integration contract you can preserve even if you replace the baseline completely.
+- a clear integration contract you can preserve even if you replace the baseline completely;
+- four deterministic public benchmark scenarios;
+- public event-level ground truth;
+- a synthetic MP4 + frame-truth generator;
+- a simple public event-count evaluator.
 
 The baseline is deliberately simple. It is not the target solution.
 
@@ -41,8 +56,6 @@ At minimum your solution must:
 
 After meeting the base requirements, you are encouraged to add a capability that demonstrates your engineering judgement: goods flow, people counting, vehicle flow, queue/occupancy, dwell, safety events, reverse-image search, semantic retrieval, anomaly detection, or another useful VMS feature.
 
-Read [CHALLENGE.md](CHALLENGE.md), [RULES.md](RULES.md), [SUBMISSION.md](SUBMISSION.md), and [SCORING.md](SCORING.md) before starting.
-
 ## Quick start
 
 ```bash
@@ -55,33 +68,62 @@ Activate the virtual environment for your operating system, then:
 
 ```bash
 pip install -r requirements.txt
-python starter/main.py --input path/to/video.mp4 --output-dir output
+```
+
+Generate the common public benchmark data:
+
+```bash
+python tools/generate_synthetic_dataset.py --all --output-dir data/generated
+```
+
+Run the starter on one public clip:
+
+```bash
+python starter/main.py --input data/generated/S01_BASIC_GOODS.mp4 --output-dir output
 ```
 
 Use `--display` if you want a live preview window.
+
+## Public benchmark scenarios
+
+- `S01_BASIC_GOODS` - clean A-to-B/B-to-A movement.
+- `S02_OCCLUSION_REVERSAL` - occlusion, reversal, pause and resume.
+- `S03_DENSE_CROSSING` - multiple close simultaneous trajectories.
+- `S04_DWELL_QUEUE` - queue/dwell behavior and temporal state.
+
+Public event truth is in `data/ground_truth/public_event_truth.csv`. Finalists may receive unseen footage, so hard-coding public answers will not generalize.
 
 ## Repository layout
 
 ```text
 .
+├── README.md
 ├── CHALLENGE.md
 ├── RULES.md
 ├── SCORING.md
 ├── SUBMISSION.md
 ├── requirements.txt
+├── docs/
+│   └── CANDIDATE_GUIDE.md
 ├── config/
 │   └── example_config.json
 ├── nop_reference/
 │   ├── evidence_contract.json
 │   └── event_types.md
-├── starter/
-│   ├── main.py
-│   ├── detector.py
-│   ├── tracker.py
-│   ├── zones.py
-│   └── evidence.py
-└── tests/
-    └── test_evidence_contract.py
+├── data/
+│   ├── README.md
+│   ├── scenarios/
+│   ├── ground_truth/
+│   └── sample_outputs/
+├── tools/
+│   ├── generate_synthetic_dataset.py
+│   └── evaluate_events.py
+└── starter/
+    ├── main.py
+    ├── detector.py
+    ├── tracker.py
+    ├── zones.py
+    └── evidence.py
 ```
 
 ## Important
